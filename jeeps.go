@@ -22,7 +22,7 @@ type JavaProcess struct {
 }
 
 func (p *JavaProcess) String() string {
-	return p.mainClass
+	return fmt.Sprintf("pid=%d main=%s args=%s", p.pid, p.mainClass, p.args)
 }
 
 func main() {
@@ -37,7 +37,7 @@ func main() {
 
 func listProcs() ([]JavaProcess, error) {
 	// run the jps command - we get a nice error if it cannot be found in $PATH
-	cmd := exec.Command("jps", "-l", "-v")
+	cmd := exec.Command("jps", "-l", "-v", "-m")
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
@@ -50,7 +50,8 @@ func listProcs() ([]JavaProcess, error) {
 	lines := strings.Split(out.String(), lineSeparator)
 	for _, line := range lines {
 		if len(strings.TrimSpace(line)) > 0 {
-			fields := strings.Fields(line)
+			// strings.Fields() does not work for finding the main class.
+			fields := strings.Split(line, " ")
 			pid, err := strconv.Atoi(fields[0])
 			if err != nil {
 				log.Fatal("could not convert pid from: " + fields[0])
