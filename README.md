@@ -1,1 +1,1 @@
-# `jeeps`: java jps command with terminal colors
+`jeeps`: java jps command enhanced with terminal colors

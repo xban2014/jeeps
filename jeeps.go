@@ -31,7 +31,7 @@ func lineSeparator() (sep string) {
 	return
 }
 
-func listProcs() ([]JavaProcess, error) {
+func listProcs() ([]jpsInfo, error) {
 	cmd := exec.Command("jps", "-l", "-v", "-m")
 	var out bytes.Buffer
 	cmd.Stdout = &out
@@ -42,8 +42,8 @@ func listProcs() ([]JavaProcess, error) {
 	return parseProcessList(out.String()), nil
 }
 
-func parseProcessList(out string) (result []JavaProcess) {
-	result = make([]JavaProcess, 0, 5)
+func parseProcessList(out string) (result []jpsInfo) {
+	result = make([]jpsInfo, 0, 5)
 	lines := strings.Split(out, lineSeparator())
 	for _, line := range lines {
 		if len(strings.TrimSpace(line)) > 0 {
@@ -59,39 +59,35 @@ func parseProcessList(out string) (result []JavaProcess) {
 				continue
 			}
 			args := fields[2:]
-			result = append(result, NewJavaProcess(pid, mainClass, args))
+			result = append(result, newJavaProcess(pid, mainClass, args))
 		}
 	}
 	return result
 }
 
-// JavaProcess - collection of details about a Java process
-type JavaProcess struct {
+type jpsInfo struct {
 	pid       int
 	mainClass string
-	args      []string // all args
 	xargs     []string // -X<something> args
 	sysargs   []string // -D<something> args
 	pargs     []string // regular process args
 }
 
-// NewJavaProcess constructor
-func NewJavaProcess(pid int, mainClass string, args []string) JavaProcess {
-	var jp JavaProcess
+func newJavaProcess(pid int, mainClass string, args []string) jpsInfo {
+	var jp jpsInfo
 	jp.pid = pid
 	jp.mainClass = mainClass
-	jp.args = args
 	jp.xargs, jp.sysargs, jp.pargs = splitJavaArgs(args)
 	return jp
 }
 
-func (p *JavaProcess) plainText() string {
+func (p *jpsInfo) plainText() string {
 	return fmt.Sprintf(
 		"pid=%d main=%s xArgs=%s, sysArgs=%s, prgArgs=%s",
 		p.pid, p.mainClass, p.xargs, p.sysargs, p.pargs)
 }
 
-func (p *JavaProcess) colorText(dark bool) string {
+func (p *jpsInfo) colorText(dark bool) string {
 	return fmt.Sprintf(
 		"%s %s %s %s %s",
 		colorPid(dark)("%d", p.pid),
@@ -101,7 +97,7 @@ func (p *JavaProcess) colorText(dark bool) string {
 		colorPrgArgs(dark)("%s", strings.Join(p.pargs, " ")))
 }
 
-func (p *JavaProcess) getMainClass() string {
+func (p *jpsInfo) getMainClass() string {
 	if len(p.mainClass) > 0 {
 		return p.mainClass
 	}
