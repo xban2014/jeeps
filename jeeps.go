@@ -59,7 +59,7 @@ func parseProcessList(out string) (result []jpsInfo) {
 				continue
 			}
 			args := fields[2:]
-			result = append(result, newJavaProcess(pid, mainClass, args))
+			result = append(result, newJpsInfo(pid, mainClass, args))
 		}
 	}
 	return result
@@ -73,7 +73,7 @@ type jpsInfo struct {
 	pargs     []string // regular process args
 }
 
-func newJavaProcess(pid int, mainClass string, args []string) jpsInfo {
+func newJpsInfo(pid int, mainClass string, args []string) jpsInfo {
 	var jp jpsInfo
 	jp.pid = pid
 	jp.mainClass = mainClass
