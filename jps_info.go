@@ -88,7 +88,7 @@ func (p *jpsInfo) getMainClass() string {
 	if len(p.mainClass) > 0 {
 		return p.mainClass
 	}
-	return "?"
+	return "<main>"
 }
 
 func colorPid(dark bool) func(string, ...interface{}) string {

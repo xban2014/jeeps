@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+// can't get ps auxww on MacOS. There is some nasty command that approximates it
+// (ps -Ao user,pid,%cpu,%mem,vsz,rss,tt,stat,start,time,command).
 func runPSAUXWW() ([]jpsInfo, error) {
 	cmd := exec.Command("ps", "auxww")
 	var out bytes.Buffer
@@ -25,7 +27,7 @@ func parsePSAUXWWOutput(out string) (result []jpsInfo) {
 	for _, line := range lines {
 		if len(strings.TrimSpace(line)) > 0 {
 			// Note: strings.Fields() does not work for finding the main class.
-			// It eats away empty fields. IntelliJ Idea shows no main class for instance.
+			// It eats away empty fields. For ex, IntelliJ Idea shows no main class for instance.
 			fields := strings.Split(line, " ")
 			pid, err := strconv.Atoi(fields[0])
 			if err != nil {
