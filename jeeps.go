@@ -20,7 +20,8 @@ func main() {
 func lineSeparator() (sep string) {
 	if runtime.GOOS == "windows" {
 		sep = "\r\n"
+	} else {
+		sep = "\n"
 	}
-	sep = "\n"
 	return
 }
